@@ -1,0 +1,67 @@
+INF = 999
+
+def distance_vector_routing():
+    # Step 1: Input routers
+    n = int(input("Enter number of routers: "))
+    routers = []
+    for i in range(n):
+        name = input(f"Enter name of router {i+1}: ")
+        routers.append(name)
+
+   print("\nEnter the cost matrix (use 999 for ∞):")
+    cost = []
+    for i in range(n):
+        row = list(map(int, input(f"Row {i+1}: ").split()))
+        cost.append(row)
+
+   # Step 3: Initialize routing table
+    routing_table = []
+    for i in range(n):
+        row = []
+        for j in range(n):
+            if i == j:
+                row.append([0, '-'])  # cost to self = 0, next hop = '-'
+            elif cost[i][j] != INF:
+                row.append([cost[i][j], routers[j]])
+            else:
+                row.append([INF, '-'])
+        routing_table.append(row)
+
+
+
+# Step 4: Distance Vector Algorithm
+    updated = True
+    iteration = 0
+    while updated:
+        updated = False
+        iteration += 1
+        print(f"\n--- Iteration {iteration} ---")
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    if cost[i][k] == INF or routing_table[k][j][0] == INF:
+                        continue
+                    new_cost = cost[i][k] + routing_table[k][j][0]
+                    if new_cost < routing_table[i][j][0]:
+                        routing_table[i][j][0] = new_cost
+                        routing_table[i][j][1] = routers[k]
+                        updated = True
+        print_routing_table(routers, routing_table)
+
+    print("\nRouting tables converged.")
+# Step 5: Print function
+def print_routing_table(routers, table):
+    for i in range(len(routers)):
+        print(f"\nRouting table for {routers[i]}:")
+        print("Destination\tCost\tNext Hop")
+        for j in range(len(routers)):
+            cost, next_hop = table[i][j]
+            if cost == INF:
+                cost_str = "∞"
+            else:
+                cost_str = str(cost)
+            print(f"{routers[j]}\t\t{cost_str}\t{next_hop}")
+
+# Run the program
+if __name__ == "__main__":
+    distance_vector_routing()
